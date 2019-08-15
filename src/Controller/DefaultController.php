@@ -8,6 +8,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Response;
 use App\Entity\User;
 use App\Entity\Video;
+use App\Entity\Address;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -143,27 +144,114 @@ class DefaultController extends AbstractController
 
 //
 //
+
+
+
 //       FIND USER
-        $user = $this->getDoctrine()->getRepository(User::class)->find(16);
-
-        foreach ($user->getVideos() as $video) {
-            var_dump($video->getTitle());
-        }
-
-
+//        $user = $this->getDoctrine()->getRepository(User::class)->find(16);
+//
+//        foreach ($user->getVideos() as $video) {
+//            var_dump($video->getTitle());
+//        }
 
 //      TESTING VIDEO AND USER RELATIOSHIP END
 
+//        DELETETING STUFF WITH CASCADE PROPERTY
+
+
+// CASCADE property lays in entity property on forgein key
+
+
+
+//        $manager = $this->getDoctrine()->getManager();
+//
+//        $user =  $this->getDoctrine()->getRepository(User::class)->find(1);
+//
+//        $manager->remove($user);
+//        $manager->flush();
+//
+
+// ORPHAN
+//        $manager = $this->getDoctrine()->getManager();
+//
+//        $user =  $this->getDoctrine()->getRepository(User::class)->find(2);
+//
+//        $video = $this->getDoctrine()->getRepository(Video::class)->find(4);
+//        $user->removeVideo($video);
+//        $manager->flush();
+//        foreach ($user->getVideos() as $video) {
+//            var_dump($video->getTitle());
+//        }
+
+
+// PERSIST
+
+//        $entityManager = $this->getDoctrine()->getManager();
+//        $user = new User();
+//        $user->setName('John');
+//        $address = new Address();
+//        $address->setStreet('street');
+//        $address->setNumber(153);
+//        $user->setAdress($address);
+//        $entityManager->persist($user);
+////        $entityManager->persist($address); //required if cascade option is not set on the user entity
+//        $entityManager->flush();
+//        var_dump($user->getAdress()->getStreet());
+
+// MANY TO MANY RELATIONASHIPS
 
 
 
 
+//        $entityManager = $this->getDoctrine()->getManager();
+//        for ($i=1; $i<=4; $i++) {
+//            $user = new User();
+//            $user->setName('Anuska - '.$i);
+//            $entityManager->persist($user);
+//        }
+//        $entityManager->flush();
+//
+//        var_dump('last_id '.$user->getId());
+
+
+//       $entityManager = $this->getDoctrine()->getManager();
+//
+        $user1 = $this->getDoctrine()->getRepository(User::class)->find(5);
+        $user2 = $this->getDoctrine()->getRepository(User::class)->find(2);
+        $user3 = $this->getDoctrine()->getRepository(User::class)->find(3);
+        $user4 = $this->getDoctrine()->getRepository(User::class)->find(4);
+//
+//        $user1->addFollowed($user2);
+//        $user1->addFollowed($user3);
+//        $user1->addFollowed($user4);
+//        $entityManager->flush();
+//
+//
+//var_dump($user1->getFollowed()->count());
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// POST AND GET
 //        exit($request->get('page', 'default')); // get data from $_GET
         $request->isXmlHttpRequest(); // is it an Ajax request?
         $request->request->get('page'); // get $_POST data
         $request->files->get('foo'); // get uploaded file data
 
-
+// SESSION
 //        $session->set('name', 'session value');
 //        $session->remove('name');
 //
@@ -172,7 +260,7 @@ class DefaultController extends AbstractController
 //        {
 //            exit($session->get('name'));
 //        };
-
+// COOKIE
 //        exit($request->cookies->get('PHPSESSID'));
 //        $cookie = new Cookie(
 //            'my_cookie',
@@ -186,7 +274,7 @@ class DefaultController extends AbstractController
 //
 //        $res->headers->clearCookie('my_cookie'); // clears stored cookie on denmand
 
-        //add to database
+        //ADD TO DATABASE
 //        $entityManager = $this->getDoctrine()->getManager(); //responsible for saving operations to DB
 //        $user = new User;
 //        $user->setName('Bob');
@@ -197,7 +285,7 @@ class DefaultController extends AbstractController
 //
 //        shuffle($gifts);
 
-        // flash messages
+        // FLASH MESSAGES
 
         $this->addFlash(
             'notice',
@@ -208,7 +296,7 @@ class DefaultController extends AbstractController
                 'Your message has errors be careful!'
             );
 
-//       Render with parameters
+//       RENDER CONTROLLERS WITH PARAMS
 //        return $this->render('default/index.html.twig', array(
 //            'controller_name' => 'DefaultController',
 //            'users' => $users,
@@ -220,7 +308,7 @@ class DefaultController extends AbstractController
         ));
 
 
-//        Response with dynamic variable
+//        RESPONSE WITH DYNAMIC VARS
 //         return new Response("Hello there $name");
 //        JSON
 //        return $this->json(array(

@@ -20,9 +20,10 @@ class Video
      * @ORM\Column(type="string", length=255)
      */
     private $title;
-
+// cascade lets delete relationed columns with forgein key ON DATABASE LEVEL
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="videos")
+     * @ORM\JoinColumn(nullable=true, onDelete="CASCADE")
      */
     private $user;
 
