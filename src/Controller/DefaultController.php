@@ -179,4 +179,50 @@ class DefaultController extends AbstractController
 
         );
     }
+
+    /**
+     * @Route("/download")
+     */
+    public function download()
+    {
+        $path = $this->getParameter('download_directory');
+
+        return $this->file($path.'photo.jpg');
+    }
+
+    /**
+     * @Route("/redirect-test")
+     */
+    public function redirectTest()
+    {
+        return $this->redirectToRoute('route_to_redirect', array('param' => 10));
+    }
+
+    /**
+     * @Route("/url-to-redirect/{param?}", name="route_to_redirect")
+     */
+    public function methodToRedirect()
+    {
+        exit('Test Redirection');
+    }
+
+    /**
+     * @Route("forwarding-to-controller")
+     */
+    public function forwardingToController()
+    {
+        $response = $this->forward(
+            'App\Controller\DefaultController:methodToForwardTo',
+            array('param' => 1)
+        );
+        return $response;
+    }
+
+    /**
+     * @Route("/url-to-forward-to/{param?}", name="route_to_forward_to")
+     */
+    public function methodToForwardTo($param)
+    {
+        exit('Test controller forwarding - '.$param);
+    }
 }
