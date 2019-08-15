@@ -7,11 +7,13 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Response;
 use App\Entity\User;
+use App\Entity\Video;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+
 
 
 class DefaultController extends AbstractController
@@ -33,7 +35,7 @@ class DefaultController extends AbstractController
 //     * @Route("/{name}", name="default")
 //     */
     /**
-     * @Route("/", name="default")
+     * @Route("/home", name="home")
      * @param GiftsService $gifts
      * @return Response
      */
@@ -41,12 +43,120 @@ class DefaultController extends AbstractController
     public function index(GiftsService $gifts, Request $request, SessionInterface $session)
     {
 
-        $users  = $this->getDoctrine()->getRepository(User::class)->findAll();
+//        $users  = $this->getDoctrine()->getRepository(User::class)->findAll();
 
-        if (!$users)
-        {
-            throw $this->createNotFoundException('User does not exist');
+//        if (!$users)
+//        {
+//            throw $this->createNotFoundException('User does not exist');
+//        }
+
+
+
+
+
+
+//        CRUD
+
+//            WRITE
+
+//        $entityManager = $this->getDoctrine()->getManager();
+//        $user = new User();
+//        $user->setName('Robert');
+//        $entityManager->persist($user);
+////        $entityManager->flush();
+////       var_dump('A new user saved with id of '.$user->getId());
+
+//        READ
+//        $repository = $this->getDoctrine()->getManager()->getRepository(User::class );
+//        FIND ONE RECORD
+//        $user = $repository->find(1);
+//        $user = $repository->findOneBy(['name' => 'Robert']);
+//        FIND MULTIPLE RECORDS
+//         $user = $repository->findBy(['name' => 'name - 1'],
+//             ['id' => 'DESC']);
+//        $user = $repository->findAll();
+
+//        UPDATE
+//        $entityManager = $this->getDoctrine()->getManager();
+//        $id = 2;
+//        $user = $entityManager->getRepository(User::class)->find($id);
+//        if (!$user)
+//        {
+//            throw $this->createNotFoundException('No user found for id: '.$id);
+//        }
+//        $user->setName('New user name!');
+//        $entityManager->flush();
+
+//        DELETE
+
+//        $entityManager = $this->getDoctrine()->getManager();
+//        $id = 2;
+//        $user = $entityManager->getRepository(User::class)->find($id);
+//        $entityManager->remove($user);
+//        $entityManager->flush();
+
+//        CRUD END
+
+
+
+//        RAW QUERIES
+
+//        $entityManager = $this->getDoctrine()->getManager();
+//    $conn = $entityManager->getConnection();
+//    $sql = '
+//    SELECT * FROM user u
+//    WHERE u.id > :id
+//    ';
+//    $stmt = $conn->prepare($sql);
+//    $stmt->execute(['id' => 3]);
+//
+//    var_dump($stmt->fetchAll());
+
+//    RAW QUERIES END
+
+
+
+
+
+//      TESTING VIDEO AND USER RELATIOSHIP
+
+
+//        $entityManager = $this->getDoctrine()->getManager();
+//        $user = new User();
+//        $user->setName('Robert');
+//
+//        for ($i=1; $i<=3; $i++) {
+//            $video = new Video();
+//            $video->setTitle('Video title - '.$i);
+//            $user->addVideo($video);
+//            $entityManager->persist($video);
+//        }
+//        $entityManager->persist($user);
+//
+//        $entityManager->flush();
+//
+//        var_dump('Video: '.$video->getId());
+
+//FIND VIDEO
+//        $video = $this->getDoctrine()->getRepository(Video::class)->find(1);
+//        var_dump($video->getUser()->getName());
+
+//
+//
+//       FIND USER
+        $user = $this->getDoctrine()->getRepository(User::class)->find(16);
+
+        foreach ($user->getVideos() as $video) {
+            var_dump($video->getTitle());
         }
+
+
+
+//      TESTING VIDEO AND USER RELATIOSHIP END
+
+
+
+
 
 //        exit($request->get('page', 'default')); // get data from $_GET
         $request->isXmlHttpRequest(); // is it an Ajax request?
@@ -99,10 +209,14 @@ class DefaultController extends AbstractController
             );
 
 //       Render with parameters
+//        return $this->render('default/index.html.twig', array(
+//            'controller_name' => 'DefaultController',
+//            'users' => $users,
+//            'random_gift' => $gifts->gifts,
+//        ));
+
         return $this->render('default/index.html.twig', array(
-            'controller_name' => 'DefaultController',
-            'users' => $users,
-            'random_gift' => $gifts->gifts,
+            'controller_name' => 'DefaultController'
         ));
 
 
@@ -128,7 +242,17 @@ class DefaultController extends AbstractController
 //        return new Response("Another route");
 //    }
 
+// no route cuz this methos only gonna be used to render html
 
+
+    public function mostPopularPosts($number = 3)
+    {
+        // database call
+        $posts = ['post_1', 'post_2', 'post_3', 'post_4'];
+        return $this->render('default/most_popular_posts.html.twig', [
+            'posts' => $posts,
+        ]);
+    }
     /**
      * @Route("/blog/{page}", name="blog_list", requirements={"page"="\d+"})
      *
@@ -224,5 +348,23 @@ class DefaultController extends AbstractController
     public function methodToForwardTo($param)
     {
         exit('Test controller forwarding - '.$param);
+    }
+
+
+
+
+// GET USER WITHOU ENTITY MANAGER
+
+    // advanced route with many paramters
+    /**
+     * @Route("/without-manager/{id}")
+     * @param Request $request
+     * @param User $user
+     * @return Response
+     */
+    public function indexUser(Request $request, User $user)
+    {
+        var_dump($user);
+        return new Response('Get Params without manager');
     }
 }

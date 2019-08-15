@@ -1,7 +1,8 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}Hello DefaultController!{% endblock %}
-
+{% set users = [{name: 'Joe'}, {name: 'Moe'}, {name: 'Boe'}] %}
+{% set string = "some string \n from \n database" %}
 {% block body %}
 <style>
     .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
@@ -9,7 +10,7 @@
 </style>
 
 <div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+    <h1>Hello {{ controller_name|upper }}! ✅</h1>
 
 
     This friendly message is coming from:
@@ -18,21 +19,65 @@
         <li>Your template at <code><a href="{{ '/home/developer/syfony-course-app/templates/default/index.html.twig'|file_link(0) }}">templates/default/index.html.twig</a></code></li>
     </ul>
     <ul>
-    {% for user in users %}
+{#    {% for user in users %}#}
 {#        <li>{{ user }}</li> if not an object#}
-        {% if loop.index0 < 4 %}
-        <li>{{ user.name }} - you won {{ random_gift[loop.index0] }}</li>
-            {% else %}
-                <li>{{ user.name }}</li>
-        {% endif %}
-        {% endfor %}
-    </ul>
-    {% for label, messages in app.flashes %}
-        {% for message in messages %}
-        <div class="flash-notice">
-            {{ message }}
-        </div>
-        {% endfor %}
-    {% endfor %}
+{#        {% if loop.index0 < 4 %}#}
+{#        <li>{{ user.name }} - you won {{ random_gift[loop.index0] }}</li>#}
+{#            {% else %}#}
+{#                <li>{{ user.name }}</li>#}
+{#        {% endif %}#}
+{#        {% endfor %}#}
+{#    </ul>#}
+{#    {% for label, messages in app.flashes %}#}
+{#        {% for message in messages %}#}
+{#        <div class="flash-notice">#}
+{#            {{ message }}#}
+{#        </div>#}
+{#        {% endfor %}#}
+{#    {% endfor %}#}
+
+{#        {% for user in users if user.name == 'Boe' %}#}
+{#            <p>{{ user.name }}</p>#}
+
+{#            {% else %}#}
+{#            No users found#}
+{#        {% endfor %}#}
+
+{#        {{ include('includes/subview.html.twig', {'users': users }) }}#}
+
+{#        {% for i in 1..10 %}#}
+{#            <div class="{{ cycle(['even', 'odd'], i) }}">#}
+{#                {{i}}#}
+{#            </div>#}
+{#        {% endfor %}#}
+        {{ path('home') }}
+        {{ url('home') }}
+        {{ asset('images/logo.png') }}
+        {{ absolute_url(asset('images/logo.jpg')) }}
+
+        <img src=" {{ absolute_url(asset('images/logo.jpg')) }} " alt="Symfony course app"/>
+        {{ string|escape('html') }}
+        <p>The google tracking code: {{ ga_code }}</p>
+{#        get user data#}
+        {{ app.user }}
+{#        security bundle also proivides data from get and post example : http://127.0.0.1:8000/home?param=15#}
+        {{ app.request.get('param') }}
+        {{ app.environment }}
+{#        {{ dump(app.session) }}#}
+
+{{ render(controller(
+    'App\\Controller\\DefaultController::mostPopularPosts',
+    {'number': 5 }
+)) }}
 </div>
+{% endblock %}
+
+{% block javascripts %}
+{#    helps loading both javascripts #}
+    {{ parent() }}
+<script>
+    console.log('2 Yey');
+    var route = "{{ string|escape('js') }}";
+    console.log(route);
+</script>
 {% endblock %}

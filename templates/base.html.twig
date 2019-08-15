@@ -7,6 +7,17 @@
     </head>
     <body>
         {% block body %}{% endblock %}
-        {% block javascripts %}{% endblock %}
     </body>
 </html>
+{% block javascripts %}
+
+    <script>
+        console.log('1 base html Yey');
+    </script>
+    <script src="{{ asset('build/js/custom.js') }}"></script>
+    <script>
+        $(document).ready(function () {
+           console.log('global jquery binded')
+        });
+    </script>
+{% endblock %}
