@@ -14,6 +14,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use App\Entity\Author;
+use App\Entity\Pdf;
+use App\Entity\File;
+use App\Services\MyService;
+use App\Services\MySecondService;
 
 
 
@@ -38,10 +43,13 @@ class DefaultController extends AbstractController
     /**
      * @Route("/home", name="home")
      * @param GiftsService $gifts
+     * @param Request $request
+     * @param SessionInterface $session
+     * @param MyService $service
      * @return Response
      */
 
-    public function index(GiftsService $gifts, Request $request, SessionInterface $session)
+    public function index(GiftsService $gifts, Request $request, SessionInterface $session, MyService $service)
     {
 
 //        $users  = $this->getDoctrine()->getRepository(User::class)->findAll();
@@ -216,10 +224,10 @@ class DefaultController extends AbstractController
 
 //       $entityManager = $this->getDoctrine()->getManager();
 //
-        $user1 = $this->getDoctrine()->getRepository(User::class)->find(5);
-        $user2 = $this->getDoctrine()->getRepository(User::class)->find(2);
-        $user3 = $this->getDoctrine()->getRepository(User::class)->find(3);
-        $user4 = $this->getDoctrine()->getRepository(User::class)->find(4);
+//        $user1 = $this->getDoctrine()->getRepository(User::class)->find(5);
+//        $user2 = $this->getDoctrine()->getRepository(User::class)->find(2);
+//        $user3 = $this->getDoctrine()->getRepository(User::class)->find(3);
+//        $user4 = $this->getDoctrine()->getRepository(User::class)->find(4);
 //
 //        $user1->addFollowed($user2);
 //        $user1->addFollowed($user3);
@@ -232,11 +240,52 @@ class DefaultController extends AbstractController
 
 
 
+// EAGER LOADING OVER LAZY LOADING (USUALY USED FOR PERFORMANCE FRONTEND TASKS) (check user repo)
+
+
+
+//               $entityManager = $this->getDoctrine()->getManager();
+//               $user = new User();
+//               $user->setName('Juozukas');
+//
+//        for ($i=1; $i<=4; $i++) {
+//            $video = new Video();
+//            $video->setTitle('Video title - '. $i);
+//            $user->addVideo($video);
+//            $entityManager->persist($video);
+//        }
+//        $entityManager->persist($user);
+//
+//        $entityManager->flush();
+
+//        echo '<pre>';
+//        $user = $entityManager->getRepository(User::class)->findWithVideos(10);
+//        var_dump($user); die;
 
 
 
 
 
+//        DOCTRINE INHERITANCE MAPPING
+//        $entityManager = $this->getDoctrine()->getManager();
+//
+//        $pdf = $this->getDoctrine()->getRepository(Pdf::class)->findAll();
+//        $video = $this->getDoctrine()->getRepository(Video::class)->findAll();
+////        polymorphyc quiery as abstract File can use only select quieries
+//        $file = $this->getDoctrine()->getRepository(File::class)->findAll();
+////        $author = $this->getDoctrine()->getRepository(Author::class)->find(1);
+//        $author = $this->getDoctrine()->getRepository(Author::class)->findByIdWithPdf(1);
+//
+//        foreach ($author->getFiles() as $file) {
+////            if ($file instanceof Pdf) {
+//                dump($file->getFileName());
+////            }
+//        }
+
+
+
+
+$service->someAction();
 
 
 
