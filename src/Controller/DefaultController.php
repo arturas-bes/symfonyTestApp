@@ -2,8 +2,11 @@
 
 namespace App\Controller;
 
+use App\Entity\SecurityUser;
+use App\Form\RegisterUserType;
 use App\Services\GiftsService;
 use DateTimeZone;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,6 +29,8 @@ use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 use App\Events\VideoCreatedEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use App\Form\VideoFormType;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 
 class DefaultController extends AbstractController
@@ -57,8 +62,11 @@ class DefaultController extends AbstractController
      * @param GiftsService $gifts
      * @param Request $request
      * @param SessionInterface $session
-     * @param MyService $myService
+     * @param ServiceInterface $service
+     * @param \Swift_Mailer $mailer
+     * @param UserPasswordEncoderInterface $passwordEncoder
      * @return Response
+     * @throws \Exception
      */
 
     public function index(
@@ -66,7 +74,8 @@ class DefaultController extends AbstractController
         Request $request,
         SessionInterface $session,
         ServiceInterface $service,
-        \Swift_Mailer $mailer
+        \Swift_Mailer $mailer,
+        UserPasswordEncoderInterface $passwordEncoder
     )
     {
 
@@ -115,24 +124,41 @@ class DefaultController extends AbstractController
 
 // SWIFTMAILER
 
-        $message = (new \Swift_Message('Hello Email'))
-            ->setFrom('send@example.com')
-            ->setTo('recipient@example.com')
-            ->setBody(
-                $this->renderView(
-                // templates/emails/registration.html.twig
-                    'emails/registration.html.twig',
-                    ['name' => 'Robert']
-                ),
-                'text/html'
-            );
-        $mailer->send($message);
+//        $message = (new \Swift_Message('Hello Email'))
+//            ->setFrom('send@example.com')
+//            ->setTo('recipient@example.com')
+//            ->setBody(
+//                $this->renderView(
+//                // templates/emails/registration.html.twig
+//                    'emails/registration.html.twig',
+//                    ['name' => 'Robert']
+//                ),
+//                'text/html'
+//            );
+//        $mailer->send($message);
 
 
+// SECURITY CHECK USING ANOTATIONS
 
-
-
-
+//        $users = $entityManager->getRepository(SecurityUser::class)->findAll();
+//        dump($users);
+//        $user = new SecurityUser;
+//        $user->setEmail('admin@admin.com');
+//        $password = $passwordEncoder->encodePassword($user, 'password');
+//        $user->setPassword($password);
+//        $user->setRoles(['ROLE_ADMIN']);
+//
+//
+//        $video = new Video;
+//        $video->setTitle('video titile');
+//        $video->setFile('file path');
+//        $video->setCreatedAt(new \DateTime());
+//        $entityManager->persist($video);
+//        $user->addVideo($video);
+//        $entityManager->persist($user);
+//        $entityManager->flush();
+//
+//        dump($video->getId());
 
 
 
@@ -656,5 +682,84 @@ class DefaultController extends AbstractController
     {
         var_dump($user);
         return new Response('Get Params without manager');
+    }
+
+    /**
+     * @Route("/register", name="register")
+     * @param Request $request
+     * @param UserPasswordEncoderInterface $passwordEncoder
+     * @return Response
+     */
+    public function registerAction(
+        Request $request,
+        UserPasswordEncoderInterface $passwordEncoder
+    )
+    {
+//        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+//       $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+//       $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+
+
+
+        $manager = $this->getDoctrine()->getManager();
+        $user = new SecurityUser();
+        $form = $this->createForm(RegisterUserType::class, $user);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $user->setPassword(
+                $passwordEncoder->encodePassword($user, $form->get('password')
+                    ->getData())
+            );
+            $user->setEmail($form->get('email')->getData());
+
+            $manager->persist($user);
+            $manager->flush();
+            return $this->redirectToRoute('home');
+        }
+        return $this->render('default/register.html.twig', array(
+            'name' => 'Register',
+            'form' => $form->createView()
+        ));
+
+    }
+
+    /**
+     * @param AuthenticationUtils $authenticationUtils
+     * @return Response
+     * @Route("/login", name="login")
+     */
+    public function loginAction(AuthenticationUtils $authenticationUtils)
+    {
+        $error = $authenticationUtils->getLastAuthenticationError();
+        $lastUsername = $authenticationUtils->getLastUsername();
+
+        return $this->render('security/login.html.twig', array(
+            'last_username' => $lastUsername,
+            'error' => $error
+        ));
+    }
+
+    /**
+     * @Route("/home/{id}/delete-video", name="delete-video")
+     * @param Video $video
+     * @return Response
+     * @Security("user.getId() == video.getSecurityUser().getId()")
+     * @Security("has_role('ROLE_ADMIN')")
+     */
+    public function deleteVideo(Video $video)
+    {
+        $manager = $this->getDoctrine()->getManager();
+        $video = $manager->getRepository(Video::class)->find(1);
+        $users = $manager->getRepository(SecurityUser::class)->findAll();
+
+//        VOTERS
+        $this->denyAccessUnlessGranted('VIDEO_DELETE', $video);
+        dump($video);
+        dump($users);
+        return $this->render('/base.html.twig', array(
+            'controller_name' => 'DefaultController',
+        ));
+
     }
 }

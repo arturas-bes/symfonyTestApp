@@ -9,6 +9,29 @@
     .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
 </style>
 
+
+    {% if app.user %}
+        <a href="{{ path('logout') }}">Logout</a>
+        {% else %}
+            <a href="{{ path('login') }}">Login</a>
+    {% endif %}
+
+    {% if is_granted('ROLE_ADMIN') %}
+
+        <a href="{{ path('login') }}">Only admin can do this</a>
+
+    {% endif %}
+
+    {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+
+        <a href="{{ path('login') }}"> {{ app.user.username }}</a>
+
+    {% endif %}
+    {% if is_granted('IS_AUTHENTICATED_REMEMBERED') %}
+
+        <a href="{{ path('login') }}">Remebered auth</a>
+
+    {% endif %}
 <div class="example-wrapper">
     <h1>Hello {{ controller_name|upper }}! ✅</h1>
 
@@ -87,7 +110,7 @@
         {{ string|escape('html') }}
         <p>The google tracking code: {{ ga_code }}</p>
 {#        get user data#}
-        {{ app.user }}
+{#        {{ app.user }}#}
 {#        security bundle also proivides data from get and post example : http://127.0.0.1:8000/home?param=15#}
         {{ app.request.get('param') }}
         {{ app.environment }}
