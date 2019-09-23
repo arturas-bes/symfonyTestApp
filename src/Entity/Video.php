@@ -2,7 +2,9 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\VideoRepository")
@@ -13,6 +15,10 @@ class Video extends File
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank()
+     * @Assert\Length(min = 2, max = 20,
+     *     minMessage = "Video Title must be atleast {{ limit }} characters long")
+     *     maxMessage = "Video Title cannot be longer than {{ limit }} characters ")
      */
     private $title;
 // cascade lets delete relationed columns with forgein key ON DATABASE LEVEL
@@ -32,6 +38,26 @@ class Video extends File
      */
     private $duration;
 
+    /**
+     * @ORM\Column(type="datetime")
+     * @Assert\NotBlank()
+     * @Assert\Type("\DateTime")
+     */
+    private $created_at;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Assert\File(
+     *     maxSize="10048k",
+     *     mimeTypesMessage="Please upload a valid video"
+     * )
+     */
+    private $file;
+
+    public function __construct()
+    {
+
+    }
 
     public function getTitle(): ?string
     {
@@ -77,6 +103,30 @@ class Video extends File
     public function setDuration(int $duration): self
     {
         $this->duration = $duration;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeInterface
+    {
+        return $this->created_at;
+    }
+
+    public function setCreatedAt(\DateTimeInterface $created_at): self
+    {
+        $this->created_at = $created_at;
+
+        return $this;
+    }
+
+    public function getFile(): ?string
+    {
+        return $this->file;
+    }
+
+    public function setFile(?string $file): self
+    {
+        $this->file = $file;
 
         return $this;
     }

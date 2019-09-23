@@ -4,9 +4,9 @@
 namespace App\Services;
 
 //use App\Services\MySecondService;
-
+use Doctrine\ORM\Event\PostFlushEventArgs;
 //Services global services and service params services.yaml and controller affected
-class MyService
+class MyService implements ServiceInterface
 {
 
     public $logger;
@@ -21,13 +21,13 @@ class MyService
 //        dump($adminEmail);
 //        dump($globalParam);
 //        dump($second_service);
+       //dump('some message');
 
     }
     public function someAction()
     {
 //        dump($this->doSomething2());
-        dump($this->logger);
-        dump($this->my);
+      //  dump('some message');
     }
 //    /**
 //     * @param \App\Services\MySecondService $second_service
@@ -38,4 +38,16 @@ class MyService
 //        dump($second_service);
 
 //    }
+
+// postFlush event from service tags
+    public function postFlush(PostFlushEventArgs $args)
+    {
+        dump('hello!');
+        dump($args);
+    }
+// cache clear tag method
+    public function clear()
+    {
+        dump('cache clear');
+    }
 }
