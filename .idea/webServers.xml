@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="25005be0-6428-4d65-ac77-0b16b5130e2c" name="dasautofiks" url="http://194.5.156.26">
+        <fileTransfer host="194.5.156.26" port="21" rootFolder="/domains/dasautofiks.dk/public_html">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+          <option name="port" value="21" />
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

@@ -43,7 +43,33 @@ services:
 ##            $adminEmail: '%admin_email%'
 #             $second_service: '@App\Services\MySecondService'
 
+
+## LAZY services doesnt load instantiate if isnt needed, should be used if services are heavy depended from one another
+##    Lazy services packaage: proxy-manager-bridge
+#    App\Services\MyService:
+##        properties:
+##             my: '@App\Services\MySecondService'
+##             logger: '@monolog.logger'
+#        arguments:
+#            $service: '@App\Services\MySecondService'
+#    App\Services\MySecondService:
+#        lazy: true
+#
+
+#SERVICE ALIASES
+#    app.myservice:
+#        class: App\Services\MyService
+#        arguments:
+#            $one: 'something'
+#        public: true
+## this service event commented out work, becouse autowire: true option but if arguments used we need to uncomment line below
+#    App\Services\MyService: '@app.myservice'
+#
+##for example if we use service tag for isntance twig tag, on load our service will be added as a extension for twig engine
+
+
+#    AS THIS services uses event postFlush, so theat means than on every flush event our service will be inisiliazed, so its like an event listener for us
+#    service has to have the same method as the event
     App\Services\MyService:
-        properties:
-             my: '@App\Services\MySecondService'
-             logger: '@monolog.logger'
+        tags:
+            - {name: doctrine.event_listener, event: postFlush }

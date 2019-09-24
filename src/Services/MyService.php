@@ -21,6 +21,7 @@ class MyService
 //        dump($adminEmail);
 //        dump($globalParam);
 //        dump($second_service);
+    dump('ha we work now');
 
     }
     public function someAction()
@@ -29,6 +30,8 @@ class MyService
         dump($this->logger);
         dump($this->my);
     }
+
+
 //    /**
 //     * @param \App\Services\MySecondService $second_service
 //     * @required
@@ -38,4 +41,10 @@ class MyService
 //        dump($second_service);
 
 //    }
+
+    public function postFlush()
+    {
+        dump('post flush');
+
+    }
 }
