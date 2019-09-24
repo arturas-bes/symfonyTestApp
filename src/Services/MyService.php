@@ -21,6 +21,7 @@ class MyService implements ServiceInterface
 //        dump($adminEmail);
 //        dump($globalParam);
 //        dump($second_service);
+    dump('ha we work now');
        //dump('some message');
 
     }
@@ -29,6 +30,8 @@ class MyService implements ServiceInterface
 //        dump($this->doSomething2());
       //  dump('some message');
     }
+
+
 //    /**
 //     * @param \App\Services\MySecondService $second_service
 //     * @required

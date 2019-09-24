@@ -23,6 +23,8 @@ use App\Entity\Pdf;
 use App\Entity\File;
 use App\Services\MyService;
 use App\Services\MySecondService;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
 use App\Services\ServiceInterface;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
@@ -43,6 +45,9 @@ class DefaultController extends AbstractController
 
     public function __construct(GiftsService $gifts, $logger, EventDispatcherInterface $dispatcher)
     {
+
+//        $this->container = $container;
+//        $this->container->get('app.myservice')
         $this->dispacher = $dispatcher;
         
         //use $logger service
@@ -364,16 +369,16 @@ class DefaultController extends AbstractController
 //
 
 // ORPHAN
-//        $manager = $this->getDoctrine()->getManager();
-//
-//        $user =  $this->getDoctrine()->getRepository(User::class)->find(2);
-//
-//        $video = $this->getDoctrine()->getRepository(Video::class)->find(4);
-//        $user->removeVideo($video);
-//        $manager->flush();
-//        foreach ($user->getVideos() as $video) {
-//            var_dump($video->getTitle());
-//        }
+        $manager = $this->getDoctrine()->getManager();
+
+        $user =  $this->getDoctrine()->getRepository(User::class)->find(2);
+
+        $video = $this->getDoctrine()->getRepository(Video::class)->find(4);
+        $user->removeVideo($video);
+        $manager->flush();
+        foreach ($user->getVideos() as $video) {
+            var_dump($video->getTitle());
+        }
 
 
 // PERSIST
