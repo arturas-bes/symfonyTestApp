@@ -31,10 +31,11 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use App\Form\VideoFormType;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
-
+use Symfony\Component\Translation\TranslatorInterface;
 
 class DefaultController extends AbstractController
 {
+
     /**
      * @var EventDispatcherInterface
      */
@@ -75,11 +76,14 @@ class DefaultController extends AbstractController
         SessionInterface $session,
         ServiceInterface $service,
         \Swift_Mailer $mailer,
-        UserPasswordEncoderInterface $passwordEncoder
+        UserPasswordEncoderInterface $passwordEncoder,
+        TranslatorInterface $translator
     )
     {
 
-
+        $translated = $translator->trans('login.label');
+        dump($translated);
+        dump($request->getLocale());
 //        EVENTS
 
 //        $video = new \stdClass();
@@ -97,6 +101,8 @@ class DefaultController extends AbstractController
 
         $entityManager = $this->getDoctrine()->getManager();
         $videos = $entityManager->getRepository(Video::class)->findAll();
+
+        dump($videos);
       //  dump($videos);
      //   $video = $entityManager->getRepository(Video::class)->find(1);
 
@@ -124,18 +130,18 @@ class DefaultController extends AbstractController
 
 // SWIFTMAILER
 
-//        $message = (new \Swift_Message('Hello Email'))
-//            ->setFrom('send@example.com')
-//            ->setTo('recipient@example.com')
-//            ->setBody(
-//                $this->renderView(
-//                // templates/emails/registration.html.twig
-//                    'emails/registration.html.twig',
-//                    ['name' => 'Robert']
-//                ),
-//                'text/html'
-//            );
-//        $mailer->send($message);
+        $message = (new \Swift_Message('Hello Email'))
+            ->setFrom('send@example.com')
+            ->setTo('recipient@example.com')
+            ->setBody(
+                $this->renderView(
+                // templates/emails/registration.html.twig
+                    'emails/registration.html.twig',
+                    ['name' => 'Robert']
+                ),
+                'text/html'
+            );
+        $mailer->send($message);
 
 
 // SECURITY CHECK USING ANOTATIONS
@@ -547,6 +553,7 @@ class DefaultController extends AbstractController
         return $this->render('default/index.html.twig', array(
             'controller_name' => 'DefaultController',
             'form' => $form->createView(),
+            'count' => 2000
         ));
     }
 
@@ -727,7 +734,10 @@ class DefaultController extends AbstractController
     /**
      * @param AuthenticationUtils $authenticationUtils
      * @return Response
-     * @Route("/login", name="login")
+     * @Route({
+     *      "en": "/login",
+     *      "lt": "/prisijungti"
+     *      }, name="login")
      */
     public function loginAction(AuthenticationUtils $authenticationUtils)
     {

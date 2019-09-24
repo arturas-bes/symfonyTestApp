@@ -1,0 +1,4 @@
+login:
+  label: 'Login'
+symfony:
+  learning: "{0}Yey I learn symfony one|{1}Yey we have been learning this shit for ages two|[3, Inf]God please help me I havent learned anything many!"
