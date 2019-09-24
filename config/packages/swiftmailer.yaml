@@ -1,0 +1,10 @@
+#swiftmailer:
+#    url: '%env(MAILER_URL)%'
+#    spool: { type: 'memory' }
+# if spool commented out email will be send straight forward otherwise email gonna be held in a spool waiting for command or cron task
+
+swiftmailer:
+    url: '%env(MAILER_URL)%'
+    spool:
+        type: 'file'
+        path: '%kernel.project_dir%/var/spool'

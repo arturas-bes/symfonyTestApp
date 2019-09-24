@@ -6,6 +6,7 @@
 parameters:
     download_directory: '../public/'
     admin_email: admin@admin.com
+    video_directory: 'kernel.project_dir%/public/uploads/videos'
 
 services:
     # default configuration for services in *this* file
@@ -70,6 +71,30 @@ services:
 
 #    AS THIS services uses event postFlush, so theat means than on every flush event our service will be inisiliazed, so its like an event listener for us
 #    service has to have the same method as the event
-    App\Services\MyService:
-        tags:
-            - {name: doctrine.event_listener, event: postFlush }
+#    App\Services\MyService:
+#        tags:
+#            - {name: doctrine.event_listener, event: postFlush }
+
+## SERVICE TAGS helps to invoke events
+#    App\Services\MyService:
+#        tags:
+#            - {name: doctrine.event_listener, event: postFlush }
+#            - {name: kernel.cache_clearer }
+
+
+# MyService gonna implement service interface HELPS Multipurpose use of services
+    App\Services\ServiceInterface: '@App\Services\MyService'
+
+
+#    EVENT LISTENER
+
+#    //          EVENT LISTENERS AND SUBSCRIBERS
+    #//          main difference between those are event listene ris defined in the configuration file and subscriber always know which event is being listened
+#    App\EventListeners\KernelResponseListener:
+#        tags:
+#            - {name: kernel.event_listener, event: kernel.response }
+
+#    App\EventListeners\VideoCreatedListener:
+#      tags:
+#          - {name: kernel.event_listener, event: video.created.event, method: onVideoCreatedEvent }
+

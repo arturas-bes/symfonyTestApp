@@ -9,6 +9,29 @@
     .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
 </style>
 
+
+    {% if app.user %}
+        <a href="{{ path('logout') }}">Logout</a>
+        {% else %}
+            <a href="{{ path('login') }}">Login</a>
+    {% endif %}
+
+    {% if is_granted('ROLE_ADMIN') %}
+
+        <a href="{{ path('login') }}">Only admin can do this</a>
+
+    {% endif %}
+
+    {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+
+        <a href="{{ path('login') }}"> {{ app.user.username }}</a>
+
+    {% endif %}
+    {% if is_granted('IS_AUTHENTICATED_REMEMBERED') %}
+
+        <a href="{{ path('login') }}">Remebered auth</a>
+
+    {% endif %}
 <div class="example-wrapper">
     <h1>Hello {{ controller_name|upper }}! ✅</h1>
 
@@ -19,6 +42,34 @@
         <li>Your template at <code><a href="{{ '/home/developer/syfony-course-app/templates/default/index.html.twig'|file_link(0) }}">templates/default/index.html.twig</a></code></li>
     </ul>
     <ul>
+
+
+{#        FORM#}
+
+
+        {{ form_start(form) }}
+
+        {{ form_label(form.title) }}
+        {{ form_widget(form.title) }}
+
+        {% if form.created_at is defined %}
+        {{ form_label(form.created_at) }}
+        {{ form_widget(form.created_at) }}
+        {% endif %}
+
+        {{ form_label(form.file) }}
+        {{ form_widget(form.file) }}
+
+        {{ form_label(form.agreeTerms) }}
+        {{ form_widget(form.agreeTerms) }}
+
+        {{ form_label(form.save) }}
+        {{ form_widget(form.save) }}
+
+        {{ form_end(form) }}
+
+{##        {{ form(form) }}#}
+
 {#    {% for user in users %}#}
 {#        <li>{{ user }}</li> if not an object#}
 {#        {% if loop.index0 < 4 %}#}
@@ -59,7 +110,7 @@
         {{ string|escape('html') }}
         <p>The google tracking code: {{ ga_code }}</p>
 {#        get user data#}
-        {{ app.user }}
+{#        {{ app.user }}#}
 {#        security bundle also proivides data from get and post example : http://127.0.0.1:8000/home?param=15#}
         {{ app.request.get('param') }}
         {{ app.environment }}

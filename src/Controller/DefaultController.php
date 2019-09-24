@@ -2,7 +2,11 @@
 
 namespace App\Controller;
 
+use App\Entity\SecurityUser;
+use App\Form\RegisterUserType;
 use App\Services\GiftsService;
+use DateTimeZone;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,19 +25,35 @@ use App\Services\MyService;
 use App\Services\MySecondService;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+use App\Services\ServiceInterface;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
+use Symfony\Component\Cache\Adapter\TagAwareAdapter;
+use App\Events\VideoCreatedEvent;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use App\Form\VideoFormType;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 
 class DefaultController extends AbstractController
 {
-    public function __construct(GiftsService $gifts, $logger, ContainerInterface $container)
+
+    /**
+     * @var EventDispatcherInterface
+     */
+    private $dispacher;
+
+    public function __construct(GiftsService $gifts, $logger, EventDispatcherInterface $dispatcher)
     {
-        $this->container = $container;
-//        $this->container->get('app.myservice');
+
+//        $this->container = $container;
+//        $this->container->get('app.myservice')
+        $this->dispacher = $dispatcher;
+        
         //use $logger service
 
         // As functions in constructor execute first, we ovveride service method below as service was already called
     //    $gifts->gifts = ['a', 'b', 'c', 'd'];
-
 
     }
 //    /**
@@ -48,12 +68,172 @@ class DefaultController extends AbstractController
      * @param GiftsService $gifts
      * @param Request $request
      * @param SessionInterface $session
-     * @param MyService $service
+     * @param ServiceInterface $service
+     * @param \Swift_Mailer $mailer
+     * @param UserPasswordEncoderInterface $passwordEncoder
      * @return Response
+     * @throws \Exception
      */
 
-    public function index(GiftsService $gifts, Request $request, SessionInterface $session, MyService $service)
+    public function index(
+        GiftsService $gifts,
+        Request $request,
+        SessionInterface $session,
+        ServiceInterface $service,
+        \Swift_Mailer $mailer,
+        UserPasswordEncoderInterface $passwordEncoder
+    )
     {
+
+
+//        EVENTS
+
+//        $video = new \stdClass();
+//
+//        $video->title =  'Funny video';
+//        $video->category =  'Category';
+//        $video->category =  'Category';
+//
+//        $event = new VideoCreatedEvent($video);
+//        $this->dispacher->dispatch('video.created.event', $event);
+
+
+
+// RENDER FORM TO THE VIEW
+
+        $entityManager = $this->getDoctrine()->getManager();
+        $videos = $entityManager->getRepository(Video::class)->findAll();
+      //  dump($videos);
+     //   $video = $entityManager->getRepository(Video::class)->find(1);
+
+        $video = new Video();
+        $video->setTitle('Write a blog post');
+        $timezone = new DateTimeZone('America/New_York');
+
+//       $video->setCreatedAt(new \DateTime('tomorrow'));
+
+        $form = $this->createForm(VideoFormType::class, $video);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $file = $form->get('file')->getData();
+            $fileName = sha1(random_bytes(14).'.'.$file->guessExtension());
+            $file->move(
+                $this->getParameter('video_directory'),
+                $fileName
+            );
+//            $video->setFile($fileName);
+//            $entityManager->persist($video);
+//            $entityManager->flush();
+//            return $this->redirectToRoute('home');
+        }
+
+// SWIFTMAILER
+
+//        $message = (new \Swift_Message('Hello Email'))
+//            ->setFrom('send@example.com')
+//            ->setTo('recipient@example.com')
+//            ->setBody(
+//                $this->renderView(
+//                // templates/emails/registration.html.twig
+//                    'emails/registration.html.twig',
+//                    ['name' => 'Robert']
+//                ),
+//                'text/html'
+//            );
+//        $mailer->send($message);
+
+
+// SECURITY CHECK USING ANOTATIONS
+
+//        $users = $entityManager->getRepository(SecurityUser::class)->findAll();
+//        dump($users);
+//        $user = new SecurityUser;
+//        $user->setEmail('admin@admin.com');
+//        $password = $passwordEncoder->encodePassword($user, 'password');
+//        $user->setPassword($password);
+//        $user->setRoles(['ROLE_ADMIN']);
+//
+//
+//        $video = new Video;
+//        $video->setTitle('video titile');
+//        $video->setFile('file path');
+//        $video->setCreatedAt(new \DateTime());
+//        $entityManager->persist($video);
+//        $user->addVideo($video);
+//        $entityManager->persist($user);
+//        $entityManager->flush();
+//
+//        dump($video->getId());
+
+
+
+
+
+
+
+//        composer require symfony/cache PSR6 CACHE CONTROL
+
+//            $cache = new FilesystemAdapter();
+//
+//            $posts = $cache->getItem('database.get_posts');
+//
+//            if(!$posts->isHit())
+//            {
+//                $posts_from_db = ['post1', 'post2', 'post3'];
+//                dump('connected to Database');
+//                $posts->set(serialize($posts_from_db));
+//
+//                $posts->expiresAfter(5);
+//                $cache->save($posts);
+//            }
+//            $cache->deleteItem('database.get_posts');
+//
+//            $cache->clear();
+//            dump(unserialize($posts->get()));
+
+
+//   CACHE TAGS #########################################################################
+//        Cache item with tags can be related so for instance you can delete all needed cache by the tag
+
+//            $cache = new TagAwareAdapter(
+//                new FilesystemAdapter()
+//            );
+//
+//
+//
+//            $acer = $cache->getItem('acer');
+//            $dell = $cache->getItem('dell');
+//            $imb = $cache->getItem('ibm');
+//
+//            if (!$acer->isHit()) {
+//                    $acer_from_db  = 'acer laptop';
+//                    $acer->set($acer_from_db);
+//                    $acer->tag(['computers', 'laptopts', 'acer']);
+//                    $cache->save($acer);
+//                    dump('acer laptop from db');
+//            }
+//
+//            if (!$dell->isHit()) {
+//                $dell_from_db  = 'dell laptop';
+//                $dell->set($dell_from_db);
+//                $dell->tag(['computers', 'desktops', 'dell']);
+//                $cache->save($dell);
+//                dump('dell laptop from db');
+//            }
+//
+//            if (!$imb->isHit()) {
+//                $imb_from_db  = 'ibm laptop';
+//                $imb->set($imb_from_db);
+//                $imb->tag(['computers', 'desktops', '$ibm']);
+//                $cache->save($imb);
+//                dump('$ibm dekstop from db');
+//            }
+//            $cache->invalidateTags(['desktops']);
+//
+//            dump($acer->get());
+//            dump($dell->get());
+//            dump($imb->get());
 
 //        $users  = $this->getDoctrine()->getRepository(User::class)->findAll();
 
@@ -61,6 +241,8 @@ class DefaultController extends AbstractController
 //        {
 //            throw $this->createNotFoundException('User does not exist');
 //        }
+
+
 
 
 
@@ -287,7 +469,7 @@ class DefaultController extends AbstractController
 
 
 
-$service->someAction();
+//$service->someAction();
 
 
 
@@ -354,9 +536,7 @@ $service->someAction();
 //            'random_gift' => $gifts->gifts,
 //        ));
 
-        return $this->render('default/index.html.twig', array(
-            'controller_name' => 'DefaultController'
-        ));
+
 
 
 //        RESPONSE WITH DYNAMIC VARS
@@ -370,7 +550,10 @@ $service->someAction();
 
 //        return $this->redirectToRoute('default2');
 
-
+        return $this->render('default/index.html.twig', array(
+            'controller_name' => 'DefaultController',
+            'form' => $form->createView(),
+        ));
     }
 
 //    /**
@@ -505,5 +688,84 @@ $service->someAction();
     {
         var_dump($user);
         return new Response('Get Params without manager');
+    }
+
+    /**
+     * @Route("/register", name="register")
+     * @param Request $request
+     * @param UserPasswordEncoderInterface $passwordEncoder
+     * @return Response
+     */
+    public function registerAction(
+        Request $request,
+        UserPasswordEncoderInterface $passwordEncoder
+    )
+    {
+//        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+//       $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+//       $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+
+
+
+        $manager = $this->getDoctrine()->getManager();
+        $user = new SecurityUser();
+        $form = $this->createForm(RegisterUserType::class, $user);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $user->setPassword(
+                $passwordEncoder->encodePassword($user, $form->get('password')
+                    ->getData())
+            );
+            $user->setEmail($form->get('email')->getData());
+
+            $manager->persist($user);
+            $manager->flush();
+            return $this->redirectToRoute('home');
+        }
+        return $this->render('default/register.html.twig', array(
+            'name' => 'Register',
+            'form' => $form->createView()
+        ));
+
+    }
+
+    /**
+     * @param AuthenticationUtils $authenticationUtils
+     * @return Response
+     * @Route("/login", name="login")
+     */
+    public function loginAction(AuthenticationUtils $authenticationUtils)
+    {
+        $error = $authenticationUtils->getLastAuthenticationError();
+        $lastUsername = $authenticationUtils->getLastUsername();
+
+        return $this->render('security/login.html.twig', array(
+            'last_username' => $lastUsername,
+            'error' => $error
+        ));
+    }
+
+    /**
+     * @Route("/home/{id}/delete-video", name="delete-video")
+     * @param Video $video
+     * @return Response
+     * @Security("user.getId() == video.getSecurityUser().getId()")
+     * @Security("has_role('ROLE_ADMIN')")
+     */
+    public function deleteVideo(Video $video)
+    {
+        $manager = $this->getDoctrine()->getManager();
+        $video = $manager->getRepository(Video::class)->find(1);
+        $users = $manager->getRepository(SecurityUser::class)->findAll();
+
+//        VOTERS
+        $this->denyAccessUnlessGranted('VIDEO_DELETE', $video);
+        dump($video);
+        dump($users);
+        return $this->render('/base.html.twig', array(
+            'controller_name' => 'DefaultController',
+        ));
+
     }
 }
